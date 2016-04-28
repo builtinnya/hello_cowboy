@@ -1,11 +1,17 @@
 FROM erlang:18
 MAINTAINER Naoto Yokoyama <builtinnya@gmail.com>
 
-ADD . /hello_cowboy
-WORKDIR /hello_cowboy
+RUN apt-get update && apt-get install -y cmake
+RUN git clone https://github.com/h2o/h2o.git /h2o
+WORKDIR /h2o
+RUN cmake -DWITH_BUNDLED_SSL=on .
+RUN make
+RUN make install
 
+COPY . /hello_cowboy
+WORKDIR /hello_cowboy
 RUN make
 
-EXPOSE 8080
+EXPOSE 80 8080
 
-CMD ["./_rel/hello_cowboy_release/bin/hello_cowboy_release", "foreground"]
+CMD ["./start.sh"]
